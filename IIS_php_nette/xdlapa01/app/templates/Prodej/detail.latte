@@ -1,0 +1,50 @@
+{block #content}
+{?$sum = 0}
+{?$dop = 0}
+<h1 n:block="title">Detail prodeje</h1>
+
+<div id="container">
+    <div id="sidebar">
+        <div class="menu">
+            <ul n:inner-foreach="$menuItems as $item => $link">
+                <li><a n:href="$link">{$item}</a></li>
+            </ul>
+        </div>
+    </div>
+
+
+    <table class="grid">
+        <tr>
+            <th>Kód</th>
+            <th>Název</th>
+            <th>Cena</th>
+            <th>Na předpis</th>
+            <th>Doplatek</th>
+           <!-- <th>&nbsp;</th>-->
+        </tr>
+
+{foreach $leks as $lek}
+        <tr>
+            <td>{$lek->kod}</td>
+            <td>{$lek->ref('lek', 'lek_kod')->nazev}</td>
+            <td>{$lek->ref('lek', 'lek_kod')->cena}</td>
+            <td>{$lek->predepsany ? ano : ne}</td>
+            <td>{$lek->predepsany ? $lek->ref('lek', 'lek_kod')->doplatek : 0}</td>
+            <!--
+            <td>
+                <a n:href="edit, $lek->kod">Edit</a>
+                <a n:href="delete, $lek->kod">Delete</a>
+            </td>-->
+        </tr>
+{?$sum = $sum + $lek->ref('lek', 'lek_kod')->cena}
+{?$lek->predepsany ? $dop += $lek->ref('lek', 'lek_kod')->doplatek : ne}
+{/foreach}
+        <tr>
+            <td/><td/>
+            <td>
+                Celková cena: {$sum}
+            </td>
+            <td>Celkový doplatek: {$dop}
+            <td>Součet: {$sum - $dop}
+        </tr>
+    </table>

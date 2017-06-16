@@ -1,0 +1,72 @@
+{block #content}
+
+<h1 n:block="title">Prodeje</h1>
+
+	<div id="container">
+	    <div id="sidebar">
+        <div class="menu">
+ 	<ul n:inner-foreach="$menuItems as $item => $link">
+		<li><a n:href="$link">{$item}</a></li>
+	</ul>
+        </div>
+		</div>
+		
+<p><a n:href="add">Nový prodej</a></p>
+
+<table class="grid">
+<tr>
+	<th>Číslo</th>
+	<th>Datum</th>
+	<th>Exportováno</th>
+        <th>Pojišťovna</th>
+	<th>&nbsp;</th>
+</tr>
+
+
+{foreach $prodejs as $prodej}
+<tr>
+        <td>{$prodej->id}</td>
+	<td>{$prodej->datum}</td>
+        <td>{$prodej->exportovano}</td>
+        <td>{$prodej->pojistovna_cislo ? $prodej->pojistovna_cislo : "Bez předpisu"}</td>
+
+	<td>
+		<a n:href="detail, $prodej->id">Detail</a>
+		<a n:href="delete, $prodej->id">Smazat</a>
+	</td>
+</tr>
+{/foreach}
+</table>
+
+
+
+<!--
+<table class="grid">
+<tr>
+	<th>Číslo</th>
+	<th>Datum</th>
+	<th>Lék</th>
+	<th>&nbsp;</th>
+</tr>
+
+
+{foreach $prodejs as $prodej}
+<tr>
+        <td>{$prodej->id}</td>
+	<td>{$prodej->datum}</td>
+	
+{foreach $prodej->related('obsahoval') as $p}
+</tr><tr>
+<td/><td/><td>{$p->ref('lek', 'lek_kod')->nazev}</td>
+</tr>
+
+{/foreach}
+        <td/><td/><td/>
+	<td>
+		<a n:href="edit, $prodej->id">Edit</a>
+		<a n:href="delete, $prodej->id">Delete</a>
+	</td>
+</tr>
+{/foreach}
+</table>
+-->

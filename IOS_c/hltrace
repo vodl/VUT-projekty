@@ -1,0 +1,78 @@
+#!/bin/ksh
+#
+# Vojtech Dlapal
+# xdlapa01@stud.fit.vutbr.cz
+# 26.3.2011
+#
+# Sktrip zvyraznuje stopu z vystupu programu strace pomoci HTML
+# Zadani:    http://www.fit.vutbr.cz/study/courses/IOS/public/Lab/projekt1/projekt1.html
+
+# export LC_ALL=C - neni potreba
+export LC_COLLATE=C
+
+
+# Zpracovani parametru
+if [ "$#" -gt 0 ]; then
+  if [ "$#" -gt 2 ] || [ "$#" -eq 1 ] || [ "$1" != "-s" ]; then
+    echo "hltrace zvyrazni syntax stopy od strace.
+Pouziti: hltrace [volby] <stopa.strace >stopa.html
+Volby:
+  -s SYSCALL  Specialne zvyrazni volani SYSCALL." >/dev/stderr
+    exit 1
+    
+  else
+  SYSCALL=$2
+  fi
+fi 
+   
+
+# HTML hlavicka
+echo "<html>
+<style>
+.pid { color:darkred; }
+.ts { color:navy; }
+.number { color:red; }
+.const { color:green; }
+.string { color:blue; }
+.hlcall { text-decoration:none; font-weight:bold; color:black; }
+.call { text-decoration:none; color:olive; }
+
+</style>
+<body><pre>"
+
+
+
+# nahrazeni >,<,& specialnimi symboly
+# stringy do string class
+# konstanty do const class
+# systemova volani 
+# trida ts
+# cisla na zacatku radku jako PID - neoznaceni ts zajistuje mezera za cislem misto tecky
+# Hexa na konci za =    
+# decimalni na konci za = 
+# ostatni Hexa numbers
+# ostatni DEC numbers
+# nakonec uzivatelem definovane volani 
+
+
+# prepsano na jediny proces sedu kvuli snizeni mnozstvi procesu
+sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g' \
+    -e 's/"\([^"]*\)"/<span class="string">"\1"<\/span>/g' \
+    -e 's/\([A-Z][A-Z0-9_]*\)\([^A-Z0-9_a-z]\)/<span class="const">\1<\/span>\2/g' \
+    -e 's/\([a-z][a-z0-9_]*\)(/<a href="http:\/\/www.kernel.org\/doc\/man-pages\/online\/pages\/man2\/\1.2.html" class="call">\1<\/a>(/g' \
+    -e 's/\([0-9]\.[0-9]*\) /<span class="ts">\1<\/span> /g' \
+    -e 's/^\([0-9]*\) /<span class="pid">\1<\/span> /g' \
+    -e 's/ = \(-\{0,1\}0x[0-9a-f]\{1,\}\)/ = <span class="number">\1<\/span>/g' \
+    -e 's/ = \(-\{0,1\}[0-9]\{1,\}\)/ = <span class="number">\1<\/span>/g' \
+    -e 's/(\(-\{0,1\}0x[0-9a-f]\{1,\}\)/(<span class="number">\1<\/span>/g' \
+    -e 's/, \(-\{0,1\}0x[0-9a-f]\{1,\}\))/, <span class="number">\1<\/span>)/g' \
+    -e 's/, \(-\{0,1\}0x[0-9a-f]\{1,\}\),/, <span class="number">\1<\/span>,/g' \
+    -e 's/(\(-\{0,1\}[0-9]\{1,\}\)/(<span class="number">\1<\/span>/g' \
+    -e 's/, \(-\{0,1\}[0-9]\{1,\}\))/, <span class="number">\1<\/span>)/g' \
+    -e 's/, \(-\{0,1\}[0-9]\{1,\}\),/, <span class="number">\1<\/span>,/g' \
+    -e "s/call\">$SYSCALL</hlcall\">$SYSCALL</g" 
+
+
+# konec HTML
+echo "</pre></body></html>"
+exit 0

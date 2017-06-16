@@ -1,0 +1,215 @@
+#!/bin/ksh
+#
+# skript hleda zmeny v archivech
+# xdlapa01@stud.fit.vutbr.cz
+# Zadani:    http://www.fit.vutbr.cz/study/courses/IOS/public/Lab/projekt1/projekt1.html
+
+trap 'cd;rm -rf $tmpdir;exit 1' 0 1 2 3 15 
+
+export LC_ALL=C
+
+
+vypis_napovedy ()
+{
+  echo "ardiff vypisuje zmeny archivu, vytvari rozdilovy archiv nebo aplikuje rozdilovy
+archiv na zdrojovy archiv.
+Pouziti: ardiff [volby] archiv1 archiv2
+Volby:
+  -o SOUBOR  Pokud je cilem skriptu vytvorit archiv, bude vytvoren do souboru
+             se jmenem SOUBOR (plati pro -c a -p).
+  -l         Vypis seznamu souboru, ktere se v zadanych archivech lisi.
+  -c         Vytvoreni rozdiloveho archivu.
+  -p         Aplikace rozdiloveho archivu (argument archiv2) na zdrojovy archiv
+             (argument archiv1).
+  -r         Prepnuti do reverzniho rezimu (plati pro -p)." >&2
+  return 0 
+}
+
+# Zpracovani parametru
+while getopts ":o:lcpr" opt; do
+  case "$opt" in
+    o)
+      oopt=true
+      oarg="$OPTARG" ;;
+    l)
+      lopt=true ;;
+    c)
+      copt=true ;;
+    p)
+      popt=true ;;
+    r)
+      ropt=true ;;
+   :|\?)
+      vypis_napovedy	    
+      exit 1 ;;      
+  esac
+done
+
+# prilis malo argumentu
+if [ $# -lt 3 ]; then
+  vypis_napovedy
+  exit 1 
+fi
+
+shift "$(($OPTIND - 1))"
+# posun indexu na prepinac s predpokladanou costou k archivu 1
+
+# chybi cesta k nekteremu z archivu 
+if [ $# -ne  2 ]; then
+  vypis_napovedy
+  exit 1 
+fi
+
+
+# urceni druhu archivu vyriznutim nazvu archivu z vypisu file
+arch1_type=$(file $1 | sed "s/[^:]*: \([^ ]*\).*/\1/") 
+arch2_type=$(file $2 | sed "s/[^:]*: \([^ ]*\).*/\1/") 
+
+# adresar na docasne soubory 
+tmpdir=$(mktemp -d /tmp/vodl_ardiffXXXXXXX)
+
+tmpdir1=$(mktemp -d ${tmpdir}/a)
+tmpdir2=$(mktemp -d ${tmpdir}/b)
+
+# rozbaleni archivu pridelenou utilitou 
+if [ "$arch1_type" = "gzip" ]; then
+  tar xzf "$1" -C "$tmpdir1"
+
+elif [ "$arch1_type" = "Zip" ]; then
+  unzip -q "$1" -d "$tmpdir1"
+
+elif [ "$arch1_type" = "bzip2" ]; then
+  tar xjf "$1" -C "$tmpdir1"	
+
+elif [ "arch1_type" = "POSIX"]; then
+  tar xf "$1" -C "$tmpdir1"
+ 
+else
+  echo "Neznamy nebo neexistujici prvni archiv" >&2
+  rm -r $tmpdir
+  exit 1
+fi
+
+
+if [ "$arch2_type" = "gzip" ]; then
+  tar xzf "$2" -C "$tmpdir2"
+
+elif [ "$arch2_type" = "Zip" ]; then
+  unzip -q "$2" -d "$tmpdir2"
+
+elif [ "$arch2_type" = "bzip2" ]; then
+  tar xjf "$2" -C "$tmpdir2"	
+
+elif [ "arch2_type" = "POSIX"]; then
+  tar xf "$2" -C "$tmpdir2"
+ 
+else
+  echo "Neznamy nebo neexistujici druhy archiv" >&2
+  rm -r $tmpdir
+  exit 1
+fi
+
+
+# Zjisteni typu archivu u argumentu -o podle koncovky
+if [ $oopt ]; then
+  oarch_type=$(echo $oarg | sed 's|.*\.||g')
+  if [ "$oarch_type" = "tgz" -o "$oarch_type" = "gtar" -o "$oarch_type" = "gz" ]; then
+    oarch_type="tgz"
+  elif [ "$oarch_type" = "zip" -o "$arch_type" = "ZIP" ]; then 
+    oarch_type="zip"
+  elif [ "$oarch_type"= "tbz" -o "$oarch_type" = "bz2" ]; then
+    oarch_type="tbz"
+  elif ["$oarch_type$" = "tar" ]; then
+    oarch_type="tar"
+  else
+      echo "neznamy typ archivu jako parametr -o" >&2
+      rm -r $tmpdir
+      exit 1
+  fi
+fi
+
+# vytvoreni seznamu souboru v archivech do docasneho souboru
+mylist=$(mktemp ${tmpdir}/mylistXXXXXX) 
+find $tmpdir1 -print >> $mylist
+find $tmpdir2 -print >> $mylist
+
+# seznam rozdilnych souboru
+cat $mylist | sed -e 's|/[^/]*/[^/]*/[^/]*\(.*\)$|\1|g' -e 's|^/||g' | sort | uniq | sed '1 d' | 
+(while
+  read line
+do
+  if [ ! -e ${tmpdir1}/$line ] || [ ! -e ${tmpdir2}/$line ]; then	
+    echo $line
+    
+  else	  
+    if [ -d ${tmpdir1}/$line -a -f ${tmpdir2}/$line ] ||
+       [ -d ${tmpdir2}/$line -a -f ${tmpdir1}/$line ]; then	  
+      echo $line
+   
+    elif [ ! -d ${tmpdir1}/$line ] && [ ! -d ${tmpdir2}/$line ]; then	  
+      dif=$(diff -qa ${tmpdir1}/$line ${tmpdir2}/$line)
+       
+      if [ -n "$dif" ]; then
+        echo "$line" 
+      fi  
+ 
+    fi # konec ifu po rozhodnuti jestli jde o stejny typ souboru
+  fi # konec ifu jestli jedno z neexistuje v else vetvi
+done) > $mylist
+
+
+
+if [ $lopt ]; then
+  cat $mylist
+fi
+
+if [ -n $copt -a -n $oopt ]; then
+ 
+# vytvoreni odpovidajici adresarove struktury s patch soubory
+  cat $mylist |
+  (
+  cd $tmpdir
+  while
+    read line
+  do
+    mydir=$(echo $line | grep -o '.*/')
+    myfile=$(echo $line | sed 's|.*/||g')
+    mkdir -p ${tmpdir}/c/$mydir
+    difr=$(diff -auN a/$line b/$line 2>/dev/null)
+    if [ -n "$difr" ]; then
+      echo $difr > ${tmpdir}/c/${line}.patch 
+    else
+      difr=$(diff -auN a/$line /dev/null 2>/dev/null)	
+      if [ -n "$difr" ]; then
+        echo $difr > ${tmpdir}/c/${line}.patch 
+      else
+        diff -auN /dev/null b/$line > ${tmpdir}/c/${line}.patch 2>/dev/null
+      fi
+    fi 
+  done
+  )
+ 
+  
+(  cd ${tmpdir}/c
+  if [ "$oarch_type" = "tgz" ]; then
+    tar czf "$oarg" * 2>/dev/null 
+  
+  elif [ "$oarch_type" = "tbz" ]; then
+    tar cjf "$oarg" * 2>/dev/null
+ 
+  elif [ "$oarch_type" = "tar" ]; then
+    tar cf "$oarg" * 2>/dev/null
+  
+  else
+   zip -r -q "$oarg" * 2>/dev/null
+   
+ fi  
+ )
+ cp ${tmpdir}/c/$oarg $oarg 2>/dev/null
+
+elif [ -z "$oopt" -a -n "$copt" ] || [ -n "$oopt" -a -z "$copt" ] || [ -n $popt -o -n $ropt ]
+  then	
+  echo "Spatna kombinace prepinacu nebo prepinac nebyl implementovan" >&2
+fi
+
+rm -r $tmpdir

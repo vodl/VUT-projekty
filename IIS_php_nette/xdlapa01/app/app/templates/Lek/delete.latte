@@ -1,0 +1,11 @@
+{block #content}
+
+<h1 n:block="title">Smazat lék</h1>
+
+{if $lek}
+	<p>Určitě chcete smazat ‘{$lek->nazev}’ s kódem {$lek->kod}?</p>
+	{control deleteForm}
+
+{else}
+	<p>Lék nenalezen.</p>
+{/if}

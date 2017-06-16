@@ -1,0 +1,12 @@
+﻿{block #content}
+
+<h1 n:block="title">Vítejte v IS lékárny</h1>
+
+<div id="container">
+    <div id="sidebar">
+        <div class="menu">
+            <ul n:inner-foreach="$menuItems as $item => $link">
+                <li><a n:href="$link">{$item}</a></li>
+            </ul>
+        </div>
+    </div>

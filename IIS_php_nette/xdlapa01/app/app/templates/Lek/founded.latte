@@ -1,0 +1,40 @@
+{block #content}
+
+<h1 n:block="title">Leky</h1>
+
+<div id="container">
+    <div id="sidebar">
+        <div class="menu">
+            <ul n:inner-foreach="$menuItems as $item => $link">
+                <li><a n:href="$link">{$item}</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <p><a n:href="add">Přidat lék</a><br/>
+        <a n:href="search">Vyhledat lék</a></p>
+
+    <table class="grid">
+        <tr>
+            <th>Kód</th>
+            <th>Název</th>
+            <th>Cena</th>
+            <th>Skladem</th>
+            <th>Na předpis</th>
+            <th>Doplatek</th>
+            <th>&nbsp;</th>
+        </tr>
+
+        <tr>
+            <td>{$lek->kod}</td>
+            <td>{$lek->nazev}</td>
+            <td>{$lek->cena}</td>
+            <td>{$lek->skladem}</td>
+            <td>{$lek->na_predpis ? ano : ne}</td>
+            <td>{$lek->doplatek}</td>
+            <td>
+                <a n:href="edit, $lek->kod">Edit</a>
+                <a n:href="delete, $lek->kod">Delete</a>
+            </td>
+        </tr>
+    </table>

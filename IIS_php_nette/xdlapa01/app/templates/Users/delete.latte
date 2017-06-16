@@ -1,0 +1,11 @@
+{block #content}
+
+<h1 n:block="title">Smazat uživatele</h1>
+
+{if $usr}
+	<p>Smazat uživatele ‘{$usr->username}’?</p>
+	{control deleteForm}
+
+{else}
+	<p>Uživatel nenalezen.</p>
+{/if}

@@ -1,0 +1,65 @@
+{block #content}
+
+<h1 n:block="title">Export dokončen</h1>
+
+<div id="container">
+    <div id="sidebar">
+        <div class="menu">
+            <ul n:inner-foreach="$menuItems as $item => $link">
+                <li><a n:href="$link">{$item}</a></li>
+            </ul>
+        </div>
+    </div>
+
+    
+<table class="grid">
+<tr>
+	<th>Číslo pojišťovny</th>
+	<th>&nbsp;</th>
+</tr>
+
+
+{foreach $arr['myArr'] as $arrPoj}
+<tr>
+        <td>{key($arr['myArr'])}</td>
+	<td>
+
+        <table class="grid">
+            <tr>
+                <th>Datum a čas</th>
+                <th>Kód léku</th>
+                <th>Doplatek</th>
+                <th>&nbsp;</th>
+            </tr>
+
+{?$celkDopl = 0}
+{foreach $arrPoj as $arrProdej}
+            <tr>
+                <td>{$prodejRep->findById(key($arr))->datum}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+{foreach $arrProdej as $lekCislo}
+            <tr>
+                <td></td>
+                <td>{$lekCislo}</td>
+                <td>{$lekRep->findByID($lekCislo)->doplatek}</td>
+                <td></td>
+            </tr>
+{?$celkDopl += $lekRep->findByID($lekCislo)->doplatek}
+{/foreach}
+{/foreach}
+
+            <tr>
+                <td></td>
+                <td></td>
+                <td>Celkem: {$celkDopl}</td>
+                <td></td>
+            </tr>
+        </table>
+
+</td></tr>
+{/foreach}
+</table>

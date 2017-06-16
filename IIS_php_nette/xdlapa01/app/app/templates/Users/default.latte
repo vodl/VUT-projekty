@@ -1,0 +1,37 @@
+{block #content}
+
+<h1 n:block="title">Uživatelé</h1>
+
+  <div id="container">
+    <div id="sidebar">
+      <div class="menu">
+ 	<ul n:inner-foreach="$menuItems as $item => $link">
+	  <li><a n:href="$link">{$item}</a></li>
+	</ul>
+       </div>
+     </div>
+		
+<p><a n:href="add">Přidat uživatele</a></p>
+
+<table class="grid">
+<tr>
+	<th>id</th>
+	<th>usrname</th>
+	<th>name</th>
+        <th>role</th>
+	<th>&nbsp;</th>
+</tr>
+
+{foreach $usrs as $usr}
+<tr>
+	<td>{$usr->id}</td>
+	<td>{$usr->username}</td>
+	<td>{$usr->name}</td>
+        <td>{$usr->role}</td>
+	<td>
+		<a n:href="edit, $usr->id">Edit</a>
+		<a n:href="delete, $usr->id">Delete</a>
+	</td>
+</tr>
+{/foreach}
+</table>

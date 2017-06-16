@@ -1,0 +1,49 @@
+{var $mail->from = "NOREPLY@IISLekarna.cz" }
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Výkaz od IIS lékárny</title>
+    </head>
+    <body>
+        <p>Dobrý den,</p>
+
+        <p>Toto je výkaz doplatků za léky pro Vaši pojišťovnu.</p>
+        <br/>
+
+        <table class="grid">
+            <tr>
+                <th>Datum a čas</th>
+                <th>Kód léku</th>
+                <th>Doplatek</th>
+                <th>&nbsp;</th>
+            </tr>
+
+{?$celkDopl = 0}
+{foreach $arr as $arrProdej}
+            <tr>
+                <td>{$prodejRep->findById(key($arr))->datum}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+{foreach $arrProdej as $lekCislo}
+            <tr>
+                <td></td>
+                <td>{$lekCislo}</td>
+                <td>{$lekRep->findByID($lekCislo)->doplatek}</td>
+                <td></td>
+            </tr>
+{?$celkDopl += $lekRep->findByID($lekCislo)->doplatek}
+{/foreach}
+{/foreach}
+
+            <tr>
+                <td></td>
+                <td></td>
+                <td>Celkem: {$celkDopl}</td>
+                <td></td>
+            </tr>
+        </table>
+    </body>
+</html>

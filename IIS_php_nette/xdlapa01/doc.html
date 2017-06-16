@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-2"/>
+    <title>Projekt IIS</title>
+    <style type="text/css">
+    	table { border-collapse: collapse; }
+    	td, th { border: 1px solid black; padding: 0.3em 0.5em; text-align: left; }
+    	dt { font-weight: bold; margin-top: 0.5em; }
+    </style>
+</head>
+<body>
+
+<!-- Zkontrolujte prosím nastavení kódování v hlavičce dokumentu 
+     podle použitého editoru -->
+
+<h1>Lékárna</h1> <!-- Nahradte názvem svého zadání -->
+
+<dl>
+	<dt>Autoři</dt>
+	<dd>Vojtěch Dlápal<!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
+	    <a href="mailto:xdlapa01@stud.fit.vutbr.cz">xdlapa01@stud.fit.vutbr.cz</a> -
+		Implementace skriptů nad frameworkem
+	</dd>
+	<dd>Ján Kebísek<!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
+	    <a href="mailto:xkebis00@stud.fit.vutbr.cz">xkebis00@stud.fit.vutbr.cz</a> - 
+		Uživatelské rozhraní, příprava databáze, testování
+	</dd>
+	<dt>URL aplikace</dt>
+	<dd><a href="http://www.stud.fit.vutbr.cz/~xdlapa01/IIS">http://www.stud.fit.vutbr.cz/~xdlapa01/IIS</a></dd>
+</dl>
+
+<h2>Uživatelé systému pro testování</h2>
+<p>Uveďte prosím existující zástupce <strong>všech rolí uživatelů</strong>.</p>
+<table>
+<tr><th>Login</th><th>Heslo</th><th>Role</th></tr>
+<tr><td>admin</td><td>admin</td><td>Administrátor</td></tr>
+<tr><td>lekarnik</td><td>lekarnik</td><td>Uživatel (lékárník)</td></tr>
+</table>
+
+<h2>Implementace</h2>
+<p>Aplikace je vystavěna nad open source frameworkem Nette a plně respektuje jeho MVP architekturu. Jako základ aplikace posloužil příklad CD-Collection,
+který je součástí frameworku. Jelikož se zadání z IDS a IUS mírně liší, bylo pokračováno v práci na projektu z IDS.</p>
+
+<h3>Model</h3>
+<p>Třídy modelu jsou umístěny ve složce model. Pro každou tabulku databáze je vytvořen repozitář, pomocí kterého je k tabulce přistupováno. 
+Většina metod je implementována ve třídě BaseRepository, od které ostatní dědí. Aktuální repozitář, se kterým se pracuje vychází z názvu třídy.</p>
+
+<h3>View</h3>
+<p>Pohledy se nacházejí ve složce templates. Jsou tvořeny html šablonami, do ktérých jsou data předána presentery pomocí latte maker. Všechny šablony
+dědí od základní šablony @layout.latte Pro každou akci prezenteru se nachází pohled ve stejnojmenné složce.</p>
+
+<h3>Presenter</h3>
+<p>Všechny presentery dědí od základní třídy BasePresenter. V jednotlivých presenterech jsou samopopisné metody pro jednotlivé stavy aplikace a továrny pro potřebné formuláře.
+Některé ze stavů jsou startup > beforeRender > action > render > metody pro obsluhu formulářů.<br/>
+Případy užití:
+<ul>
+<li>Přidat lék, vyhledat lék, ověřit naskladnění, odebrat lék, změnit atribut léku - LekPresenter</li>
+<li>Vydat lék za hotové, vydat lék na předpis - ProdejPresenter</li>
+<li>Odeslat pojišťovnám výkazy - ExportPresenter</li>
+<li>Importovat výše hrazení od pojišťoven - ImportPresenter (ukazkovy soubor doplatky.csv)</li>
+<li></li>
+<li>Správa uživatelů - UserPresenter</li>
+<li>Správa pojišťoven - PojistovnaPresenter</li>
+</ul>
+</p>
+<h3>Změny oproti konceptu v IDS</h3>
+<p>
+<ul>
+<li>Výše doplatku léku byla z důvodu efektivity dotazů a odstranění redundace přesunuta do tabulky lék, jelikož IDS zadání nevylučuje stejné výše hrazení všemi pojišťovnami.
+</li>
+<li>Akce vykonávané v UC diagramu časem přesunuty pod lékárníka z důvodu možnosti ověřit funkčnost opravujícím</li>
+<li>Forma exportu výkazu byla zvolena jako email s tabulkou obsahující doplatky na zvolenou adresu + adresu uvedenou v tabulce pojišťovny</li>
+<li>Forma importu příspěvků na léky zvolena jako CSV soubor ve formátu [kód],[nová výše doplatku] (připraven soubor doplatky.csv)</li>
+</ul>
+
+<h2>Instalace</h2>
+<ul>
+<li>Aplikace vyžaduje PHP 5.3. a Nette framework</li>
+<li>Instalace Nette Frameworku je uvedena v souboru NetteReadme.txt</li>
+<li>Aplikace je však připravena pro použití zkopírováním obsahu odevzdaného archivu na server</li>
+<li>Nette framework je ve složce libs, cesty ke knihovně jsou nastaveny v souboru index.php</li>
+<li>Pro inicializaci databáze slouží skript xdlapa01.sql</li>
+<li>Informace pro připojední k databázi se nastavují v souboru config.neon ve složce app</li>
+<li>Přidána role administrátora a jako jeho pole působnosti zvolena správa uživatelů a pojišťoven v systému</li>
+</ul>
+
+<h2>Známé problémy</h2>
+<p></p>
+
+</body>
+</html>

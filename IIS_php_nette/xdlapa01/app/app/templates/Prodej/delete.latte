@@ -1,0 +1,11 @@
+{block #content}
+
+<h1 n:block="title">Zrušit prodej</h1>
+
+{if $prodej}
+	<p>Určitě chcete zrušit prodej?</p>
+	{control deleteForm}
+
+{else}
+	<p>Prodej nenalezen.</p>
+{/if}

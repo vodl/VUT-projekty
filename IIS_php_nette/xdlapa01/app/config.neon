@@ -1,0 +1,29 @@
+#
+# SECURITY WARNING: it is CRITICAL that this file & directory are NOT accessible directly via a web browser!
+# http://nette.org/security-warning
+#
+common:
+	php:
+		date.timezone: Europe/Prague
+
+	nette:
+		database:
+			dsn: 'mysql:unix_socket=/var/run/mysql/mysql.sock;dbname=xdlapa01'
+			user: 'xdlapa01'
+			password: 'ejbesu8e'
+
+	services:
+		authenticator: Authenticator
+		albumRepository: AlbumRepository
+		
+		doplaciRepository: DoplaciRepository
+		lekRepository: LekRepository
+		obsahovalRepository: ObsahovalRepository
+		pojistovnaRepository: PojistovnaRepository
+		prodejRepository: ProdejRepository
+		
+		userRepository: UserRepository
+
+production < common:
+
+development < common:

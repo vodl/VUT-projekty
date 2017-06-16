@@ -1,0 +1,18 @@
+{block #content}
+
+
+  <div id="container">
+    <div id="sidebar">
+      <div class="menu">
+ 	<ul n:inner-foreach="$menuItems as $item => $link">
+	  <li><a n:href="$link">{$item}</a></li>
+	</ul>
+       </div>
+     </div>
+
+<h1 n:block="title">Import příspěvků</h1>
+<p> Import příspěvků na léky od pojišťoven pomocí CSV souboru, který má formát [kód léku],[nový doplatek]</p>
+
+<table class="grid">
+{control importForm}
+</table>

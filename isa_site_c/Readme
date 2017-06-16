@@ -1,0 +1,32 @@
+Mapovani adresoveho prostoru IPv6 pomoci OUI
+program: ouisearch
+autor: Vojtech Dlapal
+
+Popis:
+Program ouisearch mapuje ipv6 adresovy prostor pomoci OUI. Vyhledava v zadanem prostoru adresy s OUI, ktere jsou ve vstupnim souboru
+pomoci zasilani Echo request. Nalezene adresy vypisuje na standardni vystup.
+
+Poznamka:
+Program je treba spoustet s administratorkymi pravy.
+Program byl vyvyjen a testovan pod operacnim systemem Linux. Preklad je treba provest pomoci programu make a prilozeneho Makefile.
+
+Pouziti: ouisearch -p sit/rozsah -d filename [-s zpozdeni v mikrosekundach]
+
+Parametr -d slouzi k zadani jmena souboru, ktery obsahuje databazi OUI, ze kterych se budou vytvaret modifikovane EUI-64. Bude se jednat o textovy soubor obsahujici OUI a volitelne libovolny text oddeleny bilym znakem.
+Parametr -p slouzi ke specifikaci adresoveho prostoru, ve kterem se budou modifikovane EUI-64 adresy hledat. 
+Parametr -s slouzi k hodnote prodleni mezi jednotlivymi pozadavky Echo request v mikro sekundach
+
+Vychozi hodnotou zpozdeni mezi odeslanimi je 2500 mikro sekund. Tato hodnota je take doporucena pro plynuly beh programu. Pokud je program 
+nutne spustit tak, aby prohledaval jeden /64 blok adres za cas mensi nez jedna hodina, je treba jej spustit s parametrem -s 200, To je realne 
+pouze na testovacim systemu FreeBSD, tam ovsem neni projekt radne otestovan a proto nemohu rucit za pripadne dalsi problemy.
+
+OUI v souboru filename je treba zadat ve formatu xx:xx:xx, kazde nove na dalsi radek.
+
+priklad spusteni:
+# ouisearch -d ouis -p 2001:db8::/64 -s 2500
+
+Soubory:
+Readme
+Makefile
+main.cpp
+manual.pdf

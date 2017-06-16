@@ -1,0 +1,11 @@
+{block #content}
+
+<h1 n:block="title">Delete User</h1>
+
+{if $poj}
+	<p>Smazat pojišťovnu {$poj->nazev} s číslem {$poj->cislo}?</p>
+	{$form}
+
+{else}
+	<p>Pojišťovna nenalezena.</p>
+{/if}

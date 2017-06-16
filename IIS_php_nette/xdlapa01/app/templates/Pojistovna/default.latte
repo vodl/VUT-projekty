@@ -1,0 +1,37 @@
+{block #content}
+
+<h1 n:block="title">Pojišťovny</h1>
+
+  <div id="container">
+    <div id="sidebar">
+      <div class="menu">
+ 	<ul n:inner-foreach="$menuItems as $item => $link">
+	  <li><a n:href="$link">{$item}</a></li>
+	</ul>
+       </div>
+     </div>
+		
+<p><a n:href="add">Přidat</a></p>
+
+<table class="grid">
+<tr>
+	<th>číslo</th>
+	<th>název</th>
+	<th>email</th>
+	<th>&nbsp;</th>
+</tr>
+
+{foreach $pojs as $poj}
+{if $poj->cislo > 0}
+<tr>
+	<td>{$poj->cislo}</td>
+	<td>{$poj->nazev}</td>
+	<td>{$poj->email}</td>
+	<td>
+		<a n:href="edit, $poj->cislo">Edit</a>
+		<a n:href="delete, $poj->cislo">Delete</a>
+	</td>
+</tr>
+{/if}
+{/foreach}
+</table>
